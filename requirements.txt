@@ -1,9 +1,9 @@
-# Versions figées (pin) : quelqu'un qui clone le repo dans 2 ans obtient
-# exactement les mêmes résultats que moi. C'est la base de la reproductibilité.
-# Ce sont aussi les dernières versions compatibles Python 3.9.
-mne==1.8.0              # tout le traitement EEG : lecture EDF, filtrage, epochs, CSP
-numpy==2.0.2            # calcul matriciel (le signal EEG EST une matrice canaux x temps)
-scipy==1.13.1           # filtres numériques utilisés en interne par MNE
-scikit-learn==1.6.1     # LDA, cross-validation, matrice de confusion
-matplotlib==3.9.4       # toutes les figures
-pooch==1.8.2            # téléchargement + cache des fichiers PhysioNet par MNE
+# Pinned versions: someone cloning this repo in 2 years gets exactly the
+# same results as here. This is the basis of reproducibility.
+# Also the last set of versions compatible with Python 3.9.
+mne==1.8.0              # all EEG processing: EDF reading, filtering, epochs, CSP
+numpy==2.0.2            # matrix computation (an EEG signal IS a channels x time matrix)
+scipy==1.13.1           # digital filters used internally by MNE
+scikit-learn==1.6.1     # LDA, cross-validation, confusion matrix
+matplotlib==3.9.4       # every figure
+pooch==1.8.2            # download + cache of PhysioNet files, used by MNE

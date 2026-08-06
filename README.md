@@ -321,7 +321,7 @@ short term and nothing here depends on it.
 ## Reproduce
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ApolloStun/EEG-Motor-Imagery-CSP.git
 cd EEG-Motor-Imagery-CSP
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate

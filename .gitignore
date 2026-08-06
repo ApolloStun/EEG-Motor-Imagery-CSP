@@ -1,14 +1,14 @@
-# L'environnement virtuel ne se commit JAMAIS : il est spécifique à ma machine
-# (chemins absolus dedans) et pèse ~500 Mo. requirements.txt suffit à le recréer.
+# The virtual environment is never committed: it is machine-specific
+# (absolute paths inside) and weighs ~500 MB. requirements.txt is enough to recreate it.
 .venv/
 
-# Fichiers compilés Python, générés automatiquement
+# Compiled Python files, auto-generated
 __pycache__/
 *.pyc
 
-# Les EDF bruts téléchargés depuis PhysioNet (~50 Mo/sujet).
-# On ne commit pas de données publiques téléchargeables : le code les récupère seul.
+# Raw EDF files downloaded from PhysioNet (~50 MB/subject).
+# We don't commit downloadable public data: the code fetches it on its own.
 data/
 
-# Fichier macOS parasite
+# macOS clutter file
 .DS_Store

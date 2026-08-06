@@ -1,0 +1,103 @@
+==========================================================================
+CSP — subject 1, runs [4, 8, 12]
+==========================================================================
+
+--- INPUT ---
+  window given to CSP : 0.5 to 2.5 s
+  trials              : 45 (23 left / 22 right)
+  CSP components kept : 4 (2 per class)
+  majority-class baseline: 51.1 %  <- the number to beat
+  (not 50 %: a classifier that always answers 'left' already gets this)
+
+--- CROSS-VALIDATED ACCURACY (CSP fitted inside each fold) ---
+  single 5-fold run, seed 42, to show
+  how unstable one split is:
+
+  variant                        ch          accuracy                    per-fold
+  A. all 64 electrodes           64       77.8 +- 19.9    0.44 0.89 0.89 1.00 0.67
+  B. sensorimotor strip only     21       71.1 +- 8.9     0.67 0.78 0.78 0.56 0.78
+  C. all 64 + shrinkage          64       77.8 +- 19.9    0.44 0.89 0.89 1.00 0.67
+
+  Look at variant A's folds: one is 0.44, below the majority baseline,
+  and another is 1.00. With ~9 test trials per fold, one trial flipping
+  moves a fold by 11 points. A single mean from a single split is a
+  lottery draw, so it cannot be used to compare variants.
+
+--- THE SAME EVALUATION, REPEATED 10x WITH DIFFERENT SPLITS ---
+  This is the number to trust. Mean over repeats, +- spread of the
+  10 repeat means.
+
+  variant                        ch          accuracy      range over repeats
+  A. all 64 electrodes           64       71.3 +- 5.7            64.4 - 82.2  
+  B. sensorimotor strip only     21       62.4 +- 4.7            57.8 - 71.1  
+  C. all 64 + shrinkage          64       71.6 +- 5.8            62.2 - 82.2  
+
+--- DOES RESTRICTING THE ELECTRODES HELP? ---
+  A all 64                 : 71.3 % +- 5.7
+  B sensorimotor strip     : 62.4 % +- 4.7  (-8.9 pts vs A)
+  C all 64 + shrinkage     : 71.6 % +- 5.8  (+0.2 pts vs A)
+
+  Rule: a gap smaller than the combined spread (7.4 pts)
+  cannot be called a difference at this sample size.
+  -> A beats B by 8.9 pts, above the spread. The extra
+     electrodes carry real information the motor strip does not.
+
+  Shrinkage changes nothing at all. Worth knowing why: it rescales the
+  CSP filters but leaves the spatial PATTERNS almost untouched (max
+  difference ~4e-05 here). The covariance estimate is therefore not
+  the bottleneck for this subject — the data itself is.
+
+--- WHERE DO THE CSP PATTERNS LAND? (the step-4 question) ---
+  Per-component AUC is descriptive (fitted on all data), and tells us
+  which virtual electrode carries the separating information.
+
+  A. all 64 electrodes
+    component AUC: c1=0.88  c2=0.89  c3=0.14  c4=0.90
+    best component: c4 (AUC 0.90)
+    c1:  12.3 % of weight on motor strip,  53.7 % posterior, peak at O1
+    c2:  19.9 % of weight on motor strip,  42.6 % posterior, peak at P3
+    c3:  42.8 % of weight on motor strip,  10.4 % posterior, peak at F8
+    c4:  38.8 % of weight on motor strip,  28.0 % posterior, peak at PO4
+
+  B. sensorimotor strip only
+    component AUC: c1=0.85  c2=0.23  c3=0.82  c4=0.76
+    best component: c1 (AUC 0.85)
+    c1: 100.0 % of weight on motor strip,     n/a posterior, peak at CP5
+    c2: 100.0 % of weight on motor strip,     n/a posterior, peak at C4
+    c3: 100.0 % of weight on motor strip,     n/a posterior, peak at FC3
+    c4: 100.0 % of weight on motor strip,     n/a posterior, peak at C3
+        (posterior region is excluded from this variant by design)
+
+--- SYNTHESIS: WHAT STEP 5 ACTUALLY ESTABLISHED ---
+  1. Motor imagery IS decodable from the motor strip alone:
+     62.4 % vs a 51.1 % majority baseline. Its CSP
+     patterns peak at CP5, C4, FC3 and C3 — over the sensorimotor cortex,
+     where physiology says they should be. This is the clean result.
+
+  2. Using all 64 electrodes scores HIGHER (71.3 %), but its top
+     components are not motor: component 1 puts 12 % of its
+     weight on the motor strip and peaks at O1, an occipital electrode.
+     Component 2 peaks at P3. Both are parietal/occipital.
+
+  3. So step 4's red flag is CONFIRMED — and in the most treacherous way
+     possible. The non-motor signal does not degrade accuracy, it
+     IMPROVES it by 8.9 points. A project that only looked at the
+     score would report 71.3 % and claim to have decoded motor
+     imagery. The patterns are what expose it.
+
+  4. What we still do not know: WHAT that posterior signal is. Step 4
+     rejected the visual cue (it is bilateral), a single bad trial, and
+     fatigue. It is reproducible enough to survive 50 train/test splits,
+     so calling it pure noise no longer fits either — noise does not
+     generalise. That is an open question, stated as open.
+
+  PRACTICAL CONSEQUENCE for step 6 and 7: report both variants side by
+  side, and treat variant B as the honest motor-imagery result even
+  though it is the lower number. The headline accuracy of this project
+  should be the one we can defend, not the one that looks best.
+
+--- FIGURES WRITTEN ---
+  figures/04_csp_patterns_all64.png
+  figures/04_csp_patterns_motor.png
+  figures/04_csp_features_all64.png
+  figures/04_csp_features_motor.png

@@ -1,0 +1,81 @@
+==========================================================================
+CLASSIFICATION — subject 1, runs [4, 8, 12]
+==========================================================================
+
+--- SETUP ---
+  model            : CSP(4 components) -> LDA
+  window           : 0.5 to 2.5 s
+  trials           : 45 (23 left / 22 right)
+  cross-validation : 5-fold stratified, repeated 10x
+  baseline to beat : 51.1 % (majority class)
+
+--- 1. ACCURACY, DONE CORRECTLY ---
+  all 64 electrodes      64 ch   71.3 % +-  5.7  (repeats span 64.4 - 82.2 %)
+  sensorimotor strip     21 ch   62.4 % +-  4.7  (repeats span 57.8 - 71.1 %)
+
+--- 2. THE CLASSIC MISTAKE: CSP FITTED OUTSIDE THE CV LOOP ---
+  Same data, same folds, same classifier. The only change is that CSP
+  gets to see every label before the split.
+
+  all 64 electrodes      correct  71.3 %   leaked  95.6 %   free gain +24.2 pts
+  sensorimotor strip     correct  62.4 %   leaked  88.0 %   free gain +25.6 pts
+
+  That gain is entirely fictitious. It would not survive contact with
+  one new trial, because it comes from CSP having already seen the
+  answers. Nothing in the leaked number looks wrong — which is exactly
+  what makes this the most dangerous error in the CSP literature.
+
+--- 3. CONFUSION MATRICES (out-of-fold, pooled over 10 splits) ---
+  Accuracy hides asymmetry: 62 % could be 62/62 or 90/33.
+
+  all 64 electrodes
+                     pred left  pred right
+    true left hand         70 %         30 %
+    true right hand         36 %         64 %
+    recall: left 70 %, right 64 %  (gap 6 pts)
+
+  sensorimotor strip
+                     pred left  pred right
+    true left hand         63 %         37 %
+    true right hand         35 %         65 %
+    recall: left 63 %, right 65 %  (gap 2 pts)
+
+--- 4. PERMUTATION TEST: is this reachable by chance? ---
+  500 label shufflings, full cross-validation re-run on each.
+  IMPORTANT: this test uses ONE fixed 5-fold split, the same one for the
+  real labels and for every shuffling — that is what makes the comparison
+  fair. So the score below is the single-split score, not the repeated-CV
+  headline from section 1; step 5 showed the two differ by several points.
+  The p-value answers 'is there signal here at all', not 'how accurate is
+  the decoder'. Those are two different questions with two different
+  numbers, and conflating them is how small-sample results get oversold.
+
+  all 64 electrodes      score  77.8 %   chance distribution 49.5 % +- 8.6   p = 0.0020
+  sensorimotor strip     score  71.1 %   chance distribution 49.6 % +- 9.6   p = 0.0140
+
+  Note the chance distribution is centred near the majority baseline,
+  not at 50 %: with unbalanced classes, a useless classifier still
+  scores above a coin flip. This is why we never quote 50 % as chance.
+
+--- 5. WHAT THIS STEP ESTABLISHES ---
+  Headline result -- sensorimotor strip, the defensible one:
+    accuracy  62.4 % +- 4.7   (10x 5-fold, vs 51.1 % baseline)
+    signal    p = 0.0140   (500 shufflings on one fixed split,
+              where the real labels scored 71.1 % vs 49.6 % for shuffled ones)
+
+  Reported for transparency -- all 64 electrodes:
+    accuracy  71.3 % +- 5.7
+    signal    p = 0.0020
+
+  The sensorimotor result is statistically above chance. Given the
+  motor-centred CSP patterns from step 5, this is a genuine, if
+  modest, motor-imagery decoder.
+
+  What step 7 must add: all 10 subjects. Every number here describes ONE
+  person, and between-subject variability in motor imagery is larger than
+  any difference measured on this page.
+
+--- FIGURES WRITTEN ---
+  figures/05_confusion_matrices.png
+  figures/05_leakage.png
+  figures/05_permutation.png

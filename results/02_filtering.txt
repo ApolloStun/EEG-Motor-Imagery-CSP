@@ -1,0 +1,48 @@
+==========================================================================
+BAND-PASS FILTERING 8-30 Hz — subject 1, run 4
+==========================================================================
+
+--- THE FILTER MNE ACTUALLY BUILDS ---
+  band-pass          : 8-30 Hz
+  type               : FIR, zero-phase (no time shift at all)
+  length             : 265 coefficients = 1.66 s of signal
+  -> every output sample is computed from 1.66 s of
+     context around it. That is WHY we filter the continuous signal
+     before cutting it into epochs, and never the other way round: a
+     5 s epoch does not provide enough context, and its edges would
+     be distorted.
+
+--- WHERE IS THE POWER IN THE RAW SIGNAL? (mean over 64 channels) ---
+  0.5-4 Hz   (drift, delta)         65.8 %  #################################
+  4-8 Hz     (theta)                12.4 %  ######
+  8-12 Hz    (mu)     <- useful      5.8 %  ###
+  13-30 Hz   (beta)   <- useful      9.4 %  #####
+  30-79 Hz   (EMG, mains)            5.1 %  ###
+
+  -> useful band (8-30 Hz) : 15.2 % of total power
+  -> below 8 Hz            : 78.2 %
+  This is THE number that justifies filtering: without it, the variance
+  CSP tries to maximise would be dominated by slow drift, and it would
+  optimise on noise instead of motor activity.
+
+--- SANITY CHECK: DOES THE FILTER DO WHAT WE ASKED? ---
+    2.0 Hz (rejected):   -49.8 dB
+    5.0 Hz (rejected):   -50.0 dB
+   10.0 Hz (    kept):    +0.0 dB
+   20.0 Hz (    kept):    -0.0 dB
+   40.0 Hz (rejected):   -46.0 dB
+   60.0 Hz (rejected):   -54.9 dB
+  (0 dB = untouched ; -30 dB = power divided by 1000)
+  The mains spike at 60 Hz, clearly visible in step 2, is gone.
+
+--- SIGNAL AMPLITUDE, BEFORE AND AFTER ---
+  raw      :  53.5 uV (std, all channels)
+  filtered :  20.1 uV
+  -> amplitude divided by 2.7.
+     This is NOT a loss of useful signal: it is the disappearance of
+     the slow drift that was inflating amplitude without carrying any
+     information about motor intent.
+
+--- FIGURES WRITTEN ---
+  figures/02_before_after_signal.png
+  figures/02_before_after_psd.png

@@ -1,0 +1,9 @@
+# Versions figées (pin) : quelqu'un qui clone le repo dans 2 ans obtient
+# exactement les mêmes résultats que moi. C'est la base de la reproductibilité.
+# Ce sont aussi les dernières versions compatibles Python 3.9.
+mne==1.8.0              # tout le traitement EEG : lecture EDF, filtrage, epochs, CSP
+numpy==2.0.2            # calcul matriciel (le signal EEG EST une matrice canaux x temps)
+scipy==1.13.1           # filtres numériques utilisés en interne par MNE
+scikit-learn==1.6.1     # LDA, cross-validation, matrice de confusion
+matplotlib==3.9.4       # toutes les figures
+pooch==1.8.2            # téléchargement + cache des fichiers PhysioNet par MNE

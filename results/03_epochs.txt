@@ -1,0 +1,124 @@
+==========================================================================
+EPOCHING — subject 1, runs [4, 8, 12]
+==========================================================================
+
+--- WINDOW SANITY CHECK ---
+  epoch window requested   : -1.0 to 4.0 s
+  window fed to classifier : 0.5 to 2.5 s
+  spacing between consecutive markers: min 4.10 s, median 4.20 s
+  -> OK: window ends 0.10 s before the next marker, so no
+     epoch leaks into the following trial.
+  -> the -1 to 0 s part falls inside a T0 rest period (4.20 s long),
+     so our baseline is genuine rest, not another imagery trial.
+
+--- TRIALS OBTAINED ---
+  data shape: (45, 64, 801)
+              (trials, channels, time samples)
+  duration per trial: 801 samples = 5.01 s at 160 Hz
+
+  left_hand   :  23 trials
+  right_hand  :  22 trials
+  TOTAL       :  45 trials
+  class balance: 51.1 % / 48.9 %
+  -> chance level for a 2-class problem is 51.1 %,
+     not 50 %: always beat the majority class, not the coin flip.
+  epochs dropped for quality reasons: 0 (no rejection threshold was set)
+  events ignored because they are T0 rest, not a class: 45
+
+--- AMPLITUDE PER TRIAL (manual artifact inspection) ---
+  peak amplitude across trials: median 124 uV, min 104, max 223
+  trials with a peak above 150 uV: 5 / 45
+  We keep all of them. With ~22 trials per class, dropping trials costs
+  more than the artifacts do — and step 6 will tell us if it hurt.
+
+--- ERD IN THE CLASSIFIER WINDOW (the physiology check) ---
+  mean band-power change vs rest, 0.5-2.5 s, in %:
+
+                            C3 (left hemi)   C4 (right hemi)
+  imagined left hand                -19.0%            -18.2%
+  imagined right hand               -13.3%             -4.1%
+
+  What theory predicts: motor control crosses over, so imagining the
+  LEFT hand should drop power more at C4, and the RIGHT hand more at C3.
+  Lateralisation index LI = ERD(C3) - ERD(C4), in percentage points:
+    left  hand -> LI should be POSITIVE (C4 drops more)
+    right hand -> LI should be NEGATIVE (C3 drops more)
+    measured: LI(left) = -0.8 pts, LI(right) = -9.2 pts
+    lateralisation contrast LI(left) - LI(right) = +8.4 pts
+    (should be clearly positive if imagery is lateralised)
+
+  -> Direction matches theory, contrast +8.4 pts is above the
+     3-point noise floor we set. Weak but present.
+  Either way, CSP does not depend on C3/C4 specifically: it searches all
+  64 electrodes for whatever combination separates the classes. What this
+  check tells us is whether that combination is likely to be MOTOR.
+
+--- WHERE IS THE BETWEEN-CLASS DIFFERENCE ON THE SCALP? ---
+  A classifier does not care about ERD; it cares about any difference
+  between the two classes. So the real question is not 'is there ERD?'
+  but 'where does the difference live?'. If it lives over the
+  sensorimotor strip, we are decoding motor imagery. If it lives
+  somewhere else, we are decoding something else.
+
+  sensorimotor                 mean |LEFT-RIGHT| =    7.2 pts (max 18.8)
+  posterior (visual/parietal)  mean |LEFT-RIGHT| =   30.2 pts (max 65.7)
+  single strongest electrode: O1 (+65.7 pts)
+
+  -> RED FLAG: the between-class difference is 4.2x LARGER
+     posteriorly than over the sensorimotor strip. Something other
+     than motor imagery separates these two classes. What?
+
+  HYPOTHESIS 1 — it is the visual cue. This dataset cues trials with
+  a target on the left or right of the screen, visible for the whole
+  trial. Vision crosses over too, so a target on the RIGHT is seen by
+  the LEFT visual cortex (O1).
+  Prediction: right-hand trials drop more at O1, left-hand at O2.
+    right_hand : O1    +2.2%  O2    -1.1%  -> stronger drop at O2 (NOT as predicted)
+    left_hand  : O1   +67.9%  O2   +60.7%  -> stronger drop at O2 (as predicted)
+  -> REJECTED. The prediction fails, and the posterior effect is
+     roughly the same on both sides — it is bilateral, not
+     lateralised. A visual response to a one-sided target would
+     have to be lateralised. So this is not the cue.
+
+  HYPOTHESIS 2 — a handful of extreme trials. Occipital alpha is the
+  biggest rhythm in our band and it explodes when someone blinks a
+  lot or briefly drifts off. The mean is not robust to that; the
+  median is. If the effect is real, both should show it.
+    left_hand  : mean   +34.5%  median   +18.8%  worst trial  +341.4%
+    right_hand : mean    +4.3%  median    +0.7%  worst trial   +57.3%
+    between-class gap: +30.2 pts on means, +18.0 pts on medians
+  -> Partly. One extreme trial inflates the mean, but the gap survives
+     the median, so it is not the work of a single bad trial either.
+
+  HYPOTHESIS 3 — trial order. If one class happened to occur later in
+  the session, growing drowsiness (which raises alpha) would look
+  like a class effect. That requires the class order to be blocked.
+    class order in the recording: RLLRRLRLRLLRLRLLRLRLRLRRLLRRLLRLRLLRRLLRRLRLR
+    correlation(trial index, posterior power) = -0.14
+  -> REJECTED. The two classes alternate irregularly, i.e. the order
+     is randomised, and the drift with trial index is weak. A
+     randomised order cannot systematically favour one class.
+
+  WHAT WE ARE LEFT WITH. The posterior difference is not the visual
+  cue, not one bad trial, and not fatigue. The remaining and most
+  likely explanation is the dullest one: sampling noise. Occipital
+  alpha varies enormously from trial to trial, and with ~22 trials
+  per class a gap of this size can appear by chance. We cannot
+  settle it with 45 trials — and saying so is the honest answer.
+
+  WHY IT MATTERS ANYWAY, concretely, for step 5 and 6:
+  CSP maximises a variance ratio over all 64 electrodes. It has no
+  notion of anatomy and will happily build its filters out of
+  high-variance posterior channels if that separates the classes in
+  the training data. That is textbook overfitting, and with 45 trials
+  for a 64x64 covariance matrix we are squarely in the regime where
+  it happens.
+  ACTION for step 6: run the pipeline twice — once on all 64
+  electrodes, once restricted to the sensorimotor strip. If the
+  restricted version does as well or better, the extra electrodes
+  were feeding the classifier noise, and we will have measured it
+  instead of guessing.
+
+--- FIGURES WRITTEN ---
+  figures/03_erd_timecourse.png
+  figures/03_erd_topography.png

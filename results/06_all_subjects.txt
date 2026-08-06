@@ -1,0 +1,134 @@
+==============================================================================
+ALL SUBJECTS — [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], runs [4, 8, 12]
+==============================================================================
+Identical parameters for every subject. Nothing re-tuned per person:
+  band 8-30 Hz | window 0.5-2.5 s | 4 CSP components | 5-fold x 10
+
+--- PER-SUBJECT RESULTS ---
+   sub  trials   base        all64        motor  p(motor)  LI left LI right  post/mot   peak
+  S1  23/22     51.1%    71.3+-6      62.4+-5       0.020     -0.8     -9.2       4.2     O1
+  S2  23/22     51.1%    88.9+-4      90.9+-2       0.005     -5.5    -21.2       1.0    FT8
+  S3  23/22     51.1%    57.3+-6      43.6+-7       0.960     -5.5      8.5       5.3    PO7
+  S4  23/22     51.1%    51.3+-4      47.1+-5       0.537     -4.0     -8.0       0.7     F5
+  S5  21/24     53.3%    56.2+-7      57.3+-6       0.179      6.0     -5.4       2.0    POz
+  S6  24/21     53.3%    43.3+-9      46.9+-6       0.587     -5.0     -9.1       1.3    POz
+  S7  23/22     51.1%    98.4+-1      96.9+-2       0.005     -5.4    -16.6       1.8     T9
+  S8  22/23     51.1%    58.9+-5      49.6+-6       0.438     -1.5     -2.0       0.9    Fpz
+  S9  24/21     53.3%    50.0+-6      42.0+-5       0.851     -7.4      2.7       2.5    PO8
+  S10 24/21     53.3%    52.2+-5      62.0+-4       0.184      4.2     -1.9       0.5     Fz
+
+--- FINDING 3 FIRST: HOW WELL DOES THE METHOD WORK, REALLY? ---
+  sensorimotor strip : 59.9 % (median 53.4, range 42.0 - 96.9)
+  all 64 electrodes  : 62.8 % (median 56.8, range 43.3 - 98.4)
+  mean baseline      : 52.0 %
+
+  READ THE MEDIAN, NOT THE MEAN:
+    mean                       59.9 %
+    median                     53.4 %
+    mean without the top 2      51.4 %
+    mean majority baseline     52.0 %
+  The median sits barely above the baseline, and with the two best
+  subjects removed the pipeline is AT chance. Two people out of ten carry
+  the entire average. Quoting the mean alone would describe a decoder
+  that does not exist for eight of these ten subjects.
+
+  subjects individually above chance (p < 0.05, motor strip): 3 / 10
+  spread between best and worst subject: 54.9 points
+  That spread is the calibration argument made concrete: a single shared
+  model would have to average over people this different from each other.
+  It also matches the known 'BCI illiteracy' figure — 15-30 % of healthy
+  subjects produce no decodable motor imagery — which predicts that some
+  subjects here should simply not work. That is an expected property of
+  the paradigm, not a bug in the pipeline.
+
+--- FINDING 1: WAS SUBJECT 1'S MISSING LEFT-HAND LATERALISATION REAL? ---
+  Theory: LI(left) > 0 (C4 drops more), LI(right) < 0 (C3 drops more).
+  LI(left)  across subjects: mean -2.5 pts, 2/10 with the predicted sign
+  LI(right) across subjects: mean -6.2 pts, 8/10 with the predicted sign
+  contrast LI(left)-LI(right): mean +3.7 pts, 7/10 above the 3-pt noise floor
+
+  CAREFUL — our own metric has an offset:
+    mean LI across BOTH hands pooled: -4.4 pts
+    subjects where C3 drops more than C4 for BOTH hands: 6/10
+    So C3 tends to show more ERD than C4 whatever the hand. That is a
+    global hemispheric offset, not a hand-specific pattern, and it
+    partly manufactures the per-hand counts above: it pushes both LIs
+    negative, which 'confirms' the right hand and 'refutes' the left.
+    The offset-free measure is the CONTRAST between hands, because a
+    constant added to both cancels in the subtraction. That contrast is
+    +3.7 pts on average and clears the noise floor in 7/10 subjects,
+    so the lateralised DIFFERENCE BETWEEN HANDS is real even though the
+    per-hand story is muddier than step 4 suggested.
+
+  -> VERDICT, stated carefully. Subject 1 was not an accident: the
+     same asymmetry appears across subjects. But we CANNOT conclude
+     'the right hand lateralises and the left does not', because most
+     subjects show C3 dropping more than C4 for BOTH hands. A global
+     hemispheric offset of that kind reproduces the per-hand counts
+     on its own, so the counts are not evidence for the dominant /
+     non-dominant story.
+     What DOES survive the offset is the hand-to-hand contrast, which
+     is positive and above the noise floor in most subjects. So:
+     there IS a lateralised difference between imagining one hand and
+     the other; whether the left hand is specifically weaker remains
+     unresolved, and distinguishing the two would need handedness
+     information the dataset does not provide.
+
+--- FINDING 2: IS THE POSTERIOR SIGNAL THE PROTOCOL OR SUBJECT 1? ---
+  subjects where the between-class difference is LARGER posteriorly: 6 / 10
+  ratio posterior/sensorimotor: median 1.5, range 0.5 - 5.3
+  strongest electrode per subject: ['O1', 'FT8', 'PO7', 'F5', 'POz', 'POz', 'T9', 'Fpz', 'PO8', 'Fz']
+    posterior: 5/10   sensorimotor: 0/10   elsewhere: 5/10
+
+  Which anatomical family does each subject's strongest electrode fall in?
+    posterior (visual / attention)              5/10  S1 S3 S5 S6 S9
+    sensorimotor (what we want)                 0/10  
+    temporal (jaw / neck muscle, EMG)           2/10  S2 S7
+    frontopolar / frontal (eye movement, EOG)   3/10  S4 S8 S10
+
+  NOT ONE subject has its strongest between-class electrode over the
+  sensorimotor strip. The peaks are occipital, temporal or frontal —
+  and those three families have well-known non-brain sources: eye
+  movements frontally, jaw and neck muscle temporally, visual and
+  attentional activity posteriorly. The confound family is therefore
+  broader than the 'posterior' one step 4 chased.
+
+  -> Mixed: it happens in some subjects and not others. So it is
+     neither a protocol artefact nor a fluke of one recording, but a
+     per-subject property. Practically that is the worst case: it
+     cannot be corrected once for the whole dataset, and it means
+     per-subject pattern inspection is not optional.
+
+  CROSS-CHECK — WHO CARRIES THE AVERAGE, AND WHERE IS THEIR SIGNAL?
+    S7: 96.9 % motor-strip, strongest electrode T9 <- temporal, an EMG-prone site
+    S2: 90.9 % motor-strip, strongest electrode FT8 <- temporal, an EMG-prone site
+    Both of the two subjects carrying the entire group average have
+    their strongest between-class difference at a temporal electrode.
+    Temporal sites pick up jaw and neck muscle activity, which is
+    exactly the contamination we filtered 8-30 Hz partly to avoid —
+    and EMG extends into the upper part of that band.
+    This does NOT prove their results are muscle. Their motor-strip
+    accuracy is high on its own, and lateral strip channels (C5, C6,
+    FC5, FC6) are near enough to temporal sites that the question
+    cannot be settled by electrode position alone. But the two
+    strongest results in the study are the two where a non-brain
+    explanation is most available, and reporting a group mean without
+    saying so would be misleading.
+    What would settle it: EMG-specific checks (high-frequency power,
+    ICA artifact components), which are outside this project's scope
+    and are recorded as the most valuable next diagnostic.
+
+--- WHAT THE ALL-64 vs MOTOR-STRIP GAP LOOKS LIKE ACROSS SUBJECTS ---
+  mean gap (all64 - motor): +2.9 pts (range -9.8 to +13.8)
+  subjects where all 64 electrodes win: 6/10
+  The extra electrodes help on average, as they did for subject 1.
+  METHODOLOGY.md explains at length why that is not enough to make
+  them the headline: the gain is not attributable to motor activity,
+  and a gain you cannot attribute is a gain you cannot rely on when
+  the protocol changes.
+
+--- FIGURES WRITTEN ---
+  figures/06_subjects_accuracy.png
+  figures/06_subjects_lateralisation.png
+  figures/06_subjects_regions.png
+  results/06_all_subjects.csv

@@ -1,0 +1,53 @@
+==========================================================================
+RAW SIGNAL EXPLORATION — subject 1, runs [4, 8, 12]
+==========================================================================
+
+--- FILES ---
+  S001R04.edf     2.6 MB
+  S001R08.edf     2.6 MB
+  S001R12.edf     2.6 MB
+  total: 7.8 MB
+
+--- SIGNAL CHARACTERISTICS (per run) ---
+  run  4: 64 channels | 160 Hz | 125.0 s | 20000 samples/channel
+  run  8: 64 channels | 160 Hz | 125.0 s | 20000 samples/channel
+  run 12: 64 channels | 160 Hz | 125.0 s | 20000 samples/channel
+  -> single sampling rate across all runs: {160.0}
+
+--- THE 64 ELECTRODES (cleaned names) ---
+    FC5    FC3    FC1    FCz    FC2    FC4    FC6     C5
+     C3     C1     Cz     C2     C4     C6    CP5    CP3
+    CP1    CPz    CP2    CP4    CP6    Fp1    Fpz    Fp2
+    AF7    AF3    AFz    AF4    AF8     F7     F5     F3
+     F1     Fz     F2     F4     F6     F8    FT7    FT8
+     T7     T8     T9    T10    TP7    TP8     P7     P5
+     P3     P1     Pz     P2     P4     P6     P8    PO7
+    PO3    POz    PO4    PO8     O1     Oz     O2     Iz
+  electrodes over the motor cortex: ['FC3', 'FC4', 'C3', 'Cz', 'C4', 'CP3', 'CP4']
+
+--- ACTUAL ANNOTATIONS (the event markers) ---
+  run  4: 30 annotations  ->  T0=15, T1=8, T2=7
+  run  8: 30 annotations  ->  T0=15, T1=8, T2=7
+  run 12: 30 annotations  ->  T0=15, T1=7, T2=8
+
+  mean duration of each event type:
+    T0: 4.20 s  (min 4.20, max 4.20)
+    T1: 4.10 s  (min 4.10, max 4.10)
+    T2: 4.10 s  (min 4.10, max 4.10)
+
+--- CHECKING THE EVENT -> CODE MAPPING ---
+  mapping found by MNE:        {'T0': 1, 'T1': 2, 'T2': 3}
+  mapping assumed in config:   {'left_hand': 2, 'right_hand': 3}
+  -> config.EVENT_ID is CORRECT
+
+  number of events per code, across the 3 concatenated runs:
+    code 1 (T0):  45 events
+    code 2 (T1):  23 events
+    code 3 (T2):  22 events
+
+  total concatenated duration: 375.0 s
+
+--- FIGURES WRITTEN ---
+  figures/01_raw_signal.png
+  figures/01_montage.png
+  figures/01_raw_psd.png

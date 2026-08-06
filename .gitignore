@@ -12,3 +12,6 @@ data/
 
 # macOS clutter file
 .DS_Store
+
+# R session history, unrelated to this Python project
+.Rhistory

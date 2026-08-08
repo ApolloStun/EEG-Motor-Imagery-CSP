@@ -228,7 +228,12 @@ corresponding neural activity. The joystick was then disconnected, and cursor
 control continued through decoded neural signal alone — with Jasaun still
 physically moving his hand, illustrating the boundary between executed movement
 and pure neural decoding. Notably, the Layer 7 array achieves this without
-penetrating brain tissue, and was fully removed after the study. (Source:
+penetrating brain tissue, and was fully removed after the study. That demo stays
+anchored at level 1 precisely because Jasaun is not paralysed — the calibration
+could be aligned to a movement the system was able to observe, whereas the
+BrainGate participants cited above can only produce level 2, so their models must
+be fitted against an attempted movement that has no measurable output to align
+to. (Source:
 Precision Neuroscience, ["What a neurosurgeon looks for in a BCI: high resolution
 without tissue injury"](https://www.youtube.com/watch?v=S_hiCzHuhCs), 2026.)
 

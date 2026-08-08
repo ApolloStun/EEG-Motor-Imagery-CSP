@@ -220,6 +220,18 @@ occur, which is what makes decoding possible, but it is weaker, more variable
 trial to trial, and far more variable across people. Everything in the Results
 section is a consequence of that.
 
+This three-level hierarchy is directly illustrated by a public demonstration from
+Precision Neuroscience: participant Jasaun, implanted with the company's
+non-penetrating Layer 7 cortical array, first calibrated the system by moving a
+joystick with his hand (executed movement) while the array recorded the
+corresponding neural activity. The joystick was then disconnected, and cursor
+control continued through decoded neural signal alone — with Jasaun still
+physically moving his hand, illustrating the boundary between executed movement
+and pure neural decoding. Notably, the Layer 7 array achieves this without
+penetrating brain tissue, and was fully removed after the study. (Source:
+Precision Neuroscience, ["What a neurosurgeon looks for in a BCI: high resolution
+without tissue injury"](https://www.youtube.com/watch?v=S_hiCzHuhCs), 2026.)
+
 ### The dataset's trap
 
 PhysioNet's 14 runs per subject are not the same task:
